@@ -1,12 +1,4 @@
 <?php
-/*
-Plugin Name: WooCommerce MailWizz Integration
-Description: Adds MailWizz integration to WooCommerce, including a newsletter subscription checkbox.
-Version: 1.0
-Author: Ryan Martin
-Text Domain: woocommerce-mailwizz-integration
-*/
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Prevent direct access.
 }
