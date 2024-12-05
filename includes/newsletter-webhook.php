@@ -1,13 +1,13 @@
 <?php
-// Add newsletter checkbox on the checkout page
-add_action('woocommerce_after_order_notes', 'add_newsletter_subscription_checkbox');
-function add_newsletter_subscription_checkbox($checkout) {
-    echo '<div id="newsletter_subscription">';
+// Add the newsletter subscription checkbox above Terms and Conditions
+add_action('woocommerce_review_order_before_submit', 'add_newsletter_subscription_checkbox');
+function add_newsletter_subscription_checkbox() {
+    echo '<div id="newsletter_subscription" style="margin-bottom: 15px;">';
     woocommerce_form_field('newsletter_subscription', array(
         'type'  => 'checkbox',
         'class' => array('form-row-wide'),
         'label' => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
-    ), $checkout->get_value('newsletter_subscription'));
+    ));
     echo '</div>';
 }
 
@@ -27,7 +27,6 @@ function send_newsletter_data_to_mailwizz($order_id) {
     // Check if the user opted into the newsletter
     $subscribe = get_post_meta($order_id, '_newsletter_subscription', true);
     if ($subscribe !== 'yes') {
-        error_log('User did not opt-in for newsletter for order ID: ' . $order_id);
         return;
     }
 
@@ -46,23 +45,20 @@ function send_newsletter_data_to_mailwizz($order_id) {
     $first_name = sanitize_text_field($order->get_billing_first_name());
     $last_name = sanitize_text_field($order->get_billing_last_name());
 
-    // Validate email before proceeding
     if (empty($email)) {
         error_log('Email address is missing or invalid for order ID: ' . $order_id);
         return;
     }
 
-    // Prepare the subscriber data as a form-encoded string
+    // Prepare the subscriber data
     $subscriber_data = array(
         'EMAIL' => $email,
         'FNAME' => $first_name,
         'LNAME' => $last_name,
     );
 
+    // Prepare the API request body
     $body = http_build_query($subscriber_data);
-
-    // Log the data to ensure correct formatting
-    error_log('Form-Encoded Subscriber Data: ' . $body);
 
     // Send the request to MailWizz
     $response = wp_remote_post($api_url, array(
@@ -75,7 +71,6 @@ function send_newsletter_data_to_mailwizz($order_id) {
         'timeout'   => 45,
     ));
 
-    // Handle the response
     if (is_wp_error($response)) {
         error_log('MailWizz API error: ' . $response->get_error_message());
     } else {
@@ -89,4 +84,5 @@ function send_newsletter_data_to_mailwizz($order_id) {
         }
     }
 }
+
 ?>
