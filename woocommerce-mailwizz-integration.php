@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: WooCommerce MailWizz Integration
-Description: Adds MailWizz integration to WooCommerce, including a newsletter subscription checkbox.
-Version: 1.1
+Description: Adds MailWizz integration to WooCommerce, including a newsletter subscription checkbox and debug logging.
+Version: 1.2
 Author: Ryan Martin
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
