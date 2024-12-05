@@ -46,6 +46,7 @@ function send_newsletter_data_to_mailwizz($order_id) {
     $email = sanitize_email($order->get_billing_email());
     $first_name = sanitize_text_field($order->get_billing_first_name());
     $last_name = sanitize_text_field($order->get_billing_last_name());
+    $ip_address = get_client_ip(); // Get the client IP address
 
     if (empty($email)) {
         log_debug('Email address is missing or invalid for order ID: ' . $order_id, $debug_mode);
@@ -54,9 +55,10 @@ function send_newsletter_data_to_mailwizz($order_id) {
 
     // Prepare the subscriber data
     $subscriber_data = array(
-        'EMAIL' => $email,
-        'FNAME' => $first_name,
-        'LNAME' => $last_name,
+        'EMAIL'     => $email,
+        'FNAME'     => $first_name,
+        'LNAME'     => $last_name,
+        'IP_ADDRESS'=> $ip_address, // Add the IP address
     );
 
     $body = http_build_query($subscriber_data);
@@ -90,9 +92,28 @@ function send_newsletter_data_to_mailwizz($order_id) {
 }
 
 // Debug logging function
-function log_debug($message, $debug_mode) {
+function log_debug($message, $debug_mode = false) {
     if ($debug_mode) {
         error_log($message);
     }
+}
+
+// Retrieve the client's IP address
+function get_client_ip() {
+    $ip_keys = array(
+        'HTTP_X_FORWARDED_FOR', // Proxy forwarding
+        'HTTP_CLIENT_IP',       // Client IP behind a proxy
+        'HTTP_X_REAL_IP',       // Real IP if set
+        'REMOTE_ADDR',          // Fallback: Direct server address
+    );
+
+    foreach ($ip_keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $ip_list = explode(',', $_SERVER[$key]);
+            return trim($ip_list[0]); // Return the first valid IP
+        }
+    }
+
+    return 'UNKNOWN'; // Default if no IP is found
 }
 ?>
