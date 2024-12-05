@@ -27,15 +27,17 @@ function send_newsletter_data_to_mailwizz($order_id) {
     // Check if the user opted into the newsletter
     $subscribe = get_post_meta($order_id, '_newsletter_subscription', true);
     if ($subscribe !== 'yes') {
+        log_debug('User did not opt-in for newsletter for order ID: ' . $order_id);
         return;
     }
 
     // Get MailWizz settings
     $api_key = get_option('mailwizz_api_key');
     $api_url = get_option('mailwizz_api_endpoint');
+    $debug_mode = get_option('mailwizz_debug_mode') === 'yes'; // Debug mode setting
 
     if (empty($api_key) || empty($api_url)) {
-        error_log('MailWizz API key or endpoint is missing.');
+        log_debug('MailWizz API key or endpoint is missing.', $debug_mode);
         return;
     }
 
@@ -46,7 +48,7 @@ function send_newsletter_data_to_mailwizz($order_id) {
     $last_name = sanitize_text_field($order->get_billing_last_name());
 
     if (empty($email)) {
-        error_log('Email address is missing or invalid for order ID: ' . $order_id);
+        log_debug('Email address is missing or invalid for order ID: ' . $order_id, $debug_mode);
         return;
     }
 
@@ -57,8 +59,10 @@ function send_newsletter_data_to_mailwizz($order_id) {
         'LNAME' => $last_name,
     );
 
-    // Prepare the API request body
     $body = http_build_query($subscriber_data);
+
+    // Log the subscriber data
+    log_debug('Form-Encoded Subscriber Data: ' . $body, $debug_mode);
 
     // Send the request to MailWizz
     $response = wp_remote_post($api_url, array(
@@ -72,17 +76,23 @@ function send_newsletter_data_to_mailwizz($order_id) {
     ));
 
     if (is_wp_error($response)) {
-        error_log('MailWizz API error: ' . $response->get_error_message());
+        log_debug('MailWizz API error: ' . $response->get_error_message(), $debug_mode);
     } else {
         $status_code = wp_remote_retrieve_response_code($response);
         $response_body = wp_remote_retrieve_body($response);
 
         if ($status_code !== 200) {
-            error_log("MailWizz API error $status_code: $response_body");
+            log_debug("MailWizz API error $status_code: $response_body", $debug_mode);
         } else {
-            error_log('MailWizz API success: ' . $response_body);
+            log_debug('MailWizz API success: ' . $response_body, $debug_mode);
         }
     }
 }
 
+// Debug logging function
+function log_debug($message, $debug_mode) {
+    if ($debug_mode) {
+        error_log($message);
+    }
+}
 ?>
