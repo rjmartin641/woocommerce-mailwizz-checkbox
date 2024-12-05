@@ -36,8 +36,14 @@ function get_mailwizz_settings() {
         'api_endpoint' => array(
             'name' => __('MailWizz API Endpoint', 'woocommerce-mailwizz-integration'),
             'type' => 'text',
-            'desc' => __('Enter the API endpoint URL (e.g., https://example.com/api/v1/lists).', 'woocommerce-mailwizz-integration'),
+            'desc' => __('Enter the API endpoint URL (e.g., https://example.com/api/v1/lists/{list-unique-id}/subscribers).', 'woocommerce-mailwizz-integration'),
             'id'   => 'mailwizz_api_endpoint',
+        ),
+        'debug_mode' => array(
+            'name' => __('Debug Mode', 'woocommerce-mailwizz-integration'),
+            'type' => 'checkbox',
+            'desc' => __('Enable debug mode to log all actions.', 'woocommerce-mailwizz-integration'),
+            'id'   => 'mailwizz_debug_mode',
         ),
         'section_end' => array(
             'type' => 'sectionend',
