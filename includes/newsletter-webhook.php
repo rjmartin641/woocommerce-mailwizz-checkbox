@@ -1,27 +1,3 @@
-<?php
-// Add the newsletter subscription checkbox above Terms and Conditions
-add_action('woocommerce_review_order_before_submit', 'add_newsletter_subscription_checkbox');
-function add_newsletter_subscription_checkbox() {
-    echo '<div id="newsletter_subscription" style="margin-bottom: 15px;">';
-    woocommerce_form_field('newsletter_subscription', array(
-        'type'  => 'checkbox',
-        'class' => array('form-row-wide'),
-        'label' => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
-    ));
-    echo '</div>';
-}
-
-// Save the checkbox data to the order meta
-add_action('woocommerce_checkout_update_order_meta', 'save_newsletter_subscription_checkbox');
-function save_newsletter_subscription_checkbox($order_id) {
-    if (!empty($_POST['newsletter_subscription'])) {
-        update_post_meta($order_id, '_newsletter_subscription', 'yes');
-    } else {
-        update_post_meta($order_id, '_newsletter_subscription', 'no');
-    }
-}
-
-// Send subscriber data to MailWizz
 add_action('woocommerce_checkout_update_order_meta', 'send_newsletter_data_to_mailwizz', 20, 1);
 function send_newsletter_data_to_mailwizz($order_id) {
     // Check if the user opted into the newsletter
@@ -55,19 +31,26 @@ function send_newsletter_data_to_mailwizz($order_id) {
 
     // Prepare the subscriber data
     $subscriber_data = array(
-        'EMAIL'     => $email,
-        'FNAME'     => $first_name,
-        'LNAME'     => $last_name,
-        'IP_ADDRESS'=> $ip_address, // Add the IP address
+        'EMAIL'   => $email,
+        'FNAME'   => $first_name,
+        'LNAME'   => $last_name,
+        'details' => json_encode([
+            'ip_address' => $ip_address,
+        ]),
     );
 
+    // Encode the data for form submission
     $body = http_build_query($subscriber_data);
 
     // Log the subscriber data
     log_debug('Form-Encoded Subscriber Data: ' . $body, $debug_mode);
 
+    // Prepare the API endpoint with the list unique ID
+    $list_id = 'LIST-UNIQUE-ID'; // Replace with your actual list unique ID
+    $endpoint_url = $api_url . '/lists/' . $list_id . '/subscribers';
+
     // Send the request to MailWizz
-    $response = wp_remote_post($api_url, array(
+    $response = wp_remote_post($endpoint_url, array(
         'method'    => 'POST',
         'headers'   => array(
             'X-Api-Key'    => $api_key,
@@ -77,6 +60,7 @@ function send_newsletter_data_to_mailwizz($order_id) {
         'timeout'   => 45,
     ));
 
+    // Handle the response
     if (is_wp_error($response)) {
         log_debug('MailWizz API error: ' . $response->get_error_message(), $debug_mode);
     } else {
@@ -89,31 +73,5 @@ function send_newsletter_data_to_mailwizz($order_id) {
             log_debug('MailWizz API success: ' . $response_body, $debug_mode);
         }
     }
-}
-
-// Debug logging function
-function log_debug($message, $debug_mode = false) {
-    if ($debug_mode) {
-        error_log($message);
-    }
-}
-
-// Retrieve the client's IP address
-function get_client_ip() {
-    $ip_keys = array(
-        'HTTP_X_FORWARDED_FOR', // Proxy forwarding
-        'HTTP_CLIENT_IP',       // Client IP behind a proxy
-        'HTTP_X_REAL_IP',       // Real IP if set
-        'REMOTE_ADDR',          // Fallback: Direct server address
-    );
-
-    foreach ($ip_keys as $key) {
-        if (!empty($_SERVER[$key])) {
-            $ip_list = explode(',', $_SERVER[$key]);
-            return trim($ip_list[0]); // Return the first valid IP
-        }
-    }
-
-    return 'UNKNOWN'; // Default if no IP is found
 }
 ?>
