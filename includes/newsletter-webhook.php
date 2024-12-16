@@ -5,12 +5,12 @@ function add_newsletter_subscription_checkbox() {
     $default_checked = (get_option('mailwizz_newsletter_checkbox_default_checked', 'no') === 'yes');
 
     echo '<div id="newsletter_subscription" style="margin-bottom: 15px;">';
+    // Pass 'yes' as the value if default_checked is true, otherwise 'no'
     woocommerce_form_field('newsletter_subscription', array(
-        'type'    => 'checkbox',
-        'class'   => array('form-row-wide'),
-        'label'   => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
-        'default' => $default_checked ? 'yes' : '',
-    ));
+        'type'  => 'checkbox',
+        'class' => array('form-row-wide'),
+        'label' => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
+    ), $default_checked ? 'yes' : 'no');
     echo '</div>';
 }
 
