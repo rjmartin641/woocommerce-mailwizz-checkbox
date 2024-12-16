@@ -98,4 +98,5 @@ function log_debug($message, $debug_mode) {
         error_log($message);
     }
 }
+
 ?>
