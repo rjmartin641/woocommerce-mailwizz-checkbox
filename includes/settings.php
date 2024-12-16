@@ -45,25 +45,19 @@ function get_mailwizz_settings() {
             'desc' => __('Enable debug mode to log all actions.', 'woocommerce-mailwizz-integration'),
             'id'   => 'mailwizz_debug_mode',
         ),
+        // New checkbox to control the default state of the newsletter subscription
+        'newsletter_checkbox_default_checked' => array(
+            'name'    => __('Check newsletter subscription checkbox by default', 'woocommerce-mailwizz-integration'),
+            'type'    => 'checkbox',
+            'desc'    => __('If enabled, the newsletter subscription checkbox will be checked by default during checkout.', 'woocommerce-mailwizz-integration'),
+            'id'      => 'mailwizz_newsletter_checkbox_default_checked',
+            'default' => 'no',
+            'desc_tip' => true,
+        ),
         'section_end' => array(
             'type' => 'sectionend',
             'id'   => 'mailwizz_section_end',
         ),
     );
-}
-
-// Add the "Check newsletter subscription checkbox by default" option to WooCommerce > Settings > General
-add_filter('woocommerce_get_settings_general', 'wc_mailwizz_add_general_settings', 50);
-function wc_mailwizz_add_general_settings($settings) {
-    $settings[] = array(
-        'title'    => __('Check newsletter subscription checkbox by default', 'woocommerce-mailwizz-integration'),
-        'desc'     => __('If enabled, the newsletter subscription checkbox will be checked by default during checkout.', 'woocommerce-mailwizz-integration'),
-        'id'       => 'mailwizz_newsletter_checkbox_default_checked',
-        'default'  => 'no',
-        'type'     => 'checkbox',
-        'desc_tip' => true,
-    );
-
-    return $settings;
 }
 ?>
