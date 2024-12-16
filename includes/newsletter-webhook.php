@@ -2,11 +2,14 @@
 // Add the newsletter subscription checkbox above Terms and Conditions
 add_action('woocommerce_review_order_before_submit', 'add_newsletter_subscription_checkbox');
 function add_newsletter_subscription_checkbox() {
+    $default_checked = (get_option('mailwizz_newsletter_checkbox_default_checked', 'no') === 'yes');
+
     echo '<div id="newsletter_subscription" style="margin-bottom: 15px;">';
     woocommerce_form_field('newsletter_subscription', array(
-        'type'  => 'checkbox',
-        'class' => array('form-row-wide'),
-        'label' => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
+        'type'    => 'checkbox',
+        'class'   => array('form-row-wide'),
+        'label'   => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
+        'default' => $default_checked ? 'yes' : '',
     ));
     echo '</div>';
 }
@@ -27,14 +30,14 @@ function send_newsletter_data_to_mailwizz($order_id) {
     // Check if the user opted into the newsletter
     $subscribe = get_post_meta($order_id, '_newsletter_subscription', true);
     if ($subscribe !== 'yes') {
-        log_debug('User did not opt-in for newsletter for order ID: ' . $order_id);
+        log_debug('User did not opt-in for newsletter for order ID: ' . $order_id, get_option('mailwizz_debug_mode') === 'yes');
         return;
     }
 
     // Get MailWizz settings
     $api_key = get_option('mailwizz_api_key');
     $api_url = get_option('mailwizz_api_endpoint');
-    $debug_mode = get_option('mailwizz_debug_mode') === 'yes'; // Debug mode setting
+    $debug_mode = (get_option('mailwizz_debug_mode') === 'yes');
 
     if (empty($api_key) || empty($api_url)) {
         log_debug('MailWizz API key or endpoint is missing.', $debug_mode);
