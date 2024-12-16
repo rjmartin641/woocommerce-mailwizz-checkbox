@@ -18,7 +18,7 @@ function save_mailwizz_settings() {
     woocommerce_update_options(get_mailwizz_settings());
 }
 
-// Define the MailWizz settings fields
+// Define the MailWizz settings fields, including our new checkbox
 function get_mailwizz_settings() {
     return array(
         'section_title' => array(
@@ -45,7 +45,7 @@ function get_mailwizz_settings() {
             'desc' => __('Enable debug mode to log all actions.', 'woocommerce-mailwizz-integration'),
             'id'   => 'mailwizz_debug_mode',
         ),
-        // New checkbox to control the default state of the newsletter subscription
+        // New Checkbox Here
         'newsletter_checkbox_default_checked' => array(
             'name'    => __('Check newsletter subscription checkbox by default', 'woocommerce-mailwizz-integration'),
             'type'    => 'checkbox',
