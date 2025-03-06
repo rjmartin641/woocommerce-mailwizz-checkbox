@@ -18,7 +18,7 @@ function save_mailwizz_settings() {
     woocommerce_update_options(get_mailwizz_settings());
 }
 
-// Define the MailWizz settings fields, including our new checkbox
+// Define the MailWizz settings fields, including the new newsletter label field
 function get_mailwizz_settings() {
     return array(
         'section_title' => array(
@@ -45,7 +45,7 @@ function get_mailwizz_settings() {
             'desc' => __('Enable debug mode to log all actions.', 'woocommerce-mailwizz-integration'),
             'id'   => 'mailwizz_debug_mode',
         ),
-        // New Checkbox Here
+        // Checkbox default state setting
         'newsletter_checkbox_default_checked' => array(
             'name'    => __('Check newsletter subscription checkbox by default', 'woocommerce-mailwizz-integration'),
             'type'    => 'checkbox',
@@ -53,6 +53,14 @@ function get_mailwizz_settings() {
             'id'      => 'mailwizz_newsletter_checkbox_default_checked',
             'default' => 'no',
             'desc_tip' => true,
+        ),
+        // New field for newsletter checkbox label
+        'newsletter_checkbox_label' => array(
+            'name'    => __('Newsletter Checkbox Label', 'woocommerce-mailwizz-integration'),
+            'type'    => 'text',
+            'desc'    => __('Enter the text to display for the newsletter subscription checkbox.', 'woocommerce-mailwizz-integration'),
+            'id'      => 'mailwizz_newsletter_label',
+            'default' => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
         ),
         'section_end' => array(
             'type' => 'sectionend',
