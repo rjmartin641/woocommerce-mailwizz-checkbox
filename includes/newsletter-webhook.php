@@ -3,13 +3,15 @@
 add_action('woocommerce_review_order_before_submit', 'add_newsletter_subscription_checkbox');
 function add_newsletter_subscription_checkbox() {
     $default_checked = (get_option('mailwizz_newsletter_checkbox_default_checked', 'no') === 'yes');
+    // Retrieve the newsletter label from settings
+    $newsletter_label = get_option('mailwizz_newsletter_label', __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'));
 
     echo '<div id="newsletter_subscription" style="margin-bottom: 15px;">';
     // Pass '1' if you want the checkbox pre-checked, '' (empty) if not
     woocommerce_form_field('newsletter_subscription', array(
         'type'  => 'checkbox',
         'class' => array('form-row-wide'),
-        'label' => __('Subscribe to our newsletter', 'woocommerce-mailwizz-integration'),
+        'label' => esc_html($newsletter_label),
     ), $default_checked ? '1' : '');
     echo '</div>';
 }
